@@ -1,0 +1,327 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import Header from "../components/Header";
+import CartSummary from "./CartSummary";
+import { useCart } from "@/hooks/useCart";
+import { cartDays, cartSubtotal, removeFromCart } from "@/lib/cart";
+import { DELIVERY_FEE, DEPOSIT_RATE } from "@/lib/constants";
+
+type AddressResult = { lat: number; lng: number; distanceMiles: number };
+
+export default function CheckoutPage() {
+  const cart = useCart();
+  const days = cartDays(cart);
+  const subtotal = cartSubtotal(cart);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zip, setZip] = useState("");
+
+  const [addressResult, setAddressResult] = useState<AddressResult | null>(null);
+  const [validating, setValidating] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const [payingType, setPayingType] = useState<"deposit" | "full" | null>(null);
+  const [payError, setPayError] = useState<string | null>(null);
+
+  const [availabilityById, setAvailabilityById] = useState<Map<string, number> | null>(null);
+
+  useEffect(() => {
+    if (!cart.startDate || !cart.endDate || cart.items.length === 0) return;
+    fetch(`/api/availability?start=${cart.startDate}&end=${cart.endDate}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const map = new Map<string, number>();
+        for (const tag of ["packages", "individual", "kids"] as const) {
+          for (const p of data.groups?.[tag] ?? []) {
+            map.set(p.id, p.available);
+          }
+        }
+        setAvailabilityById(map);
+      })
+      .catch(() => {});
+  }, [cart.startDate, cart.endDate, cart.items.length]);
+
+  const hasAvailabilityIssues = useMemo(
+    () =>
+      cart.items.some((item) => {
+        const available = availabilityById?.get(item.productId);
+        return available !== undefined && item.quantity > available;
+      }),
+    [cart.items, availabilityById]
+  );
+
+  const customerFilled = name.trim() && email.trim() && phone.trim();
+  const addressFilled = address1.trim() && city.trim() && state.trim() && zip.trim();
+
+  function handleAddressFieldChange(setter: (v: string) => void) {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      setter(e.target.value);
+      setAddressResult(null);
+      setValidationError(null);
+    };
+  }
+
+  async function handleValidateAddress() {
+    setValidating(true);
+    setValidationError(null);
+    try {
+      const res = await fetch("/api/checkout/validate-address", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address1, city, state, zip }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setValidationError(data.error ?? "Something went wrong.");
+        return;
+      }
+      setAddressResult({ lat: data.lat, lng: data.lng, distanceMiles: data.distanceMiles });
+    } catch {
+      setValidationError("Something went wrong. Please try again.");
+    } finally {
+      setValidating(false);
+    }
+  }
+
+  async function handlePay(paymentType: "deposit" | "full") {
+    if (!cart.startDate || !cart.endDate) return;
+    setPayingType(paymentType);
+    setPayError(null);
+    try {
+      const res = await fetch("/api/checkout/create-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+          startDate: cart.startDate,
+          endDate: cart.endDate,
+          customer: { name, email, phone },
+          address: { address1, city, state, zip },
+          paymentType,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPayError(data.error ?? "Something went wrong.");
+        setPayingType(null);
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      setPayError("Something went wrong. Please try again.");
+      setPayingType(null);
+    }
+  }
+
+  const total = subtotal + DELIVERY_FEE;
+  const depositAmount = Math.round(total * DEPOSIT_RATE * 100) / 100;
+  const readyToPay =
+    addressResult && customerFilled && cart.items.length > 0 && !hasAvailabilityIssues;
+
+  if (cart.items.length === 0) {
+    return (
+      <div className="flex min-h-full flex-1 flex-col">
+        <Header />
+        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold text-foreground">Your cart is empty</h1>
+          <p className="text-foreground/60">Browse our rentals to start building your order.</p>
+          <Link
+            href="/products"
+            className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+          >
+            Browse Rentals
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-full flex-1 flex-col">
+      <Header />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">
+        <h1 className="mb-8 text-3xl font-bold text-foreground">Checkout</h1>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="flex flex-col gap-8">
+            <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="mb-4 text-lg font-bold text-foreground">Your Information</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1 text-sm sm:col-span-2">
+                  Full Name
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  Email
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  Phone
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="mb-4 text-lg font-bold text-foreground">Event Address</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1 text-sm sm:col-span-2">
+                  Address Line 1
+                  <input
+                    type="text"
+                    value={address1}
+                    onChange={handleAddressFieldChange(setAddress1)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  City
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={handleAddressFieldChange(setCity)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  State
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={handleAddressFieldChange(setState)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  Zip
+                  <input
+                    type="text"
+                    value={zip}
+                    onChange={handleAddressFieldChange(setZip)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+              </div>
+
+              {validationError && (
+                <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                  {validationError}
+                </p>
+              )}
+              {addressResult && (
+                <p className="mt-4 rounded-lg bg-brand/10 px-3 py-2 text-sm text-brand">
+                  You&rsquo;re within our delivery area (about{" "}
+                  {addressResult.distanceMiles.toFixed(1)} miles away). $25 delivery fee added
+                  below.
+                </p>
+              )}
+
+              {!addressResult && (
+                <button
+                  type="button"
+                  disabled={!addressFilled || validating}
+                  onClick={handleValidateAddress}
+                  className="mt-5 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {validating ? "Checking address…" : "Continue to Payment"}
+                </button>
+              )}
+            </section>
+
+            {hasAvailabilityIssues && (
+              <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                Some items in your cart are no longer available in the quantity you selected.
+                Please update your cart before continuing.{" "}
+                <Link href="/products" className="underline">
+                  Go to cart
+                </Link>
+              </p>
+            )}
+
+            {readyToPay && (
+              <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+                <h2 className="mb-4 text-lg font-bold text-foreground">Payment</h2>
+                <div className="mb-5 flex flex-col gap-2 text-sm">
+                  <div className="flex justify-between text-foreground/70">
+                    <span>Subtotal</span>
+                    <span>${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-foreground/70">
+                    <span>Delivery</span>
+                    <span>${DELIVERY_FEE.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold text-foreground">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {payError && (
+                  <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+                    {payError}
+                  </p>
+                )}
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    disabled={payingType !== null}
+                    onClick={() => handlePay("deposit")}
+                    className="flex-1 rounded-full border-2 border-brand px-5 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {payingType === "deposit"
+                      ? "Redirecting…"
+                      : `Pay 30% Deposit ($${depositAmount.toFixed(2)})`}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={payingType !== null}
+                    onClick={() => handlePay("full")}
+                    className="flex-1 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {payingType === "full" ? "Redirecting…" : `Pay in Full ($${total.toFixed(2)})`}
+                  </button>
+                </div>
+              </section>
+            )}
+          </div>
+
+          <div className="lg:sticky lg:top-20 lg:self-start">
+            <CartSummary
+              cart={cart}
+              days={days}
+              subtotal={subtotal}
+              deliveryConfirmed={!!addressResult}
+              availabilityById={availabilityById}
+              onRemove={removeFromCart}
+            />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
