@@ -17,16 +17,38 @@ export default function Header({ overlay = false, showCart = false }: HeaderProp
       }
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center">
-          <Image
-            src={overlay ? "/logo-white.png" : "/logo-black.png"}
-            alt="DW Event Co"
-            width={228}
-            height={113}
-            priority={overlay}
-            className="h-8 w-auto sm:h-10"
-          />
-        </Link>
+        {overlay ? (
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo-white.png"
+              alt="DW Event Co"
+              width={228}
+              height={113}
+              priority
+              className="h-8 w-auto sm:h-10"
+            />
+          </Link>
+        ) : (
+          <Link href="/" className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink sm:h-9 sm:w-9">
+              <Image
+                src="/icon-white.png"
+                alt=""
+                width={155}
+                height={134}
+                className="h-4.5 w-auto sm:h-5"
+              />
+            </span>
+            <span className="flex flex-col leading-none">
+              <span className="text-lg font-extrabold uppercase tracking-wide text-foreground sm:text-xl">
+                DW Event Co
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-foreground/50 sm:text-xs">
+                Party &amp; Event Rentals
+              </span>
+            </span>
+          </Link>
+        )}
 
         {showCart ? (
           <CartIndicator overlay={overlay} />

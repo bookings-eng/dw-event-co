@@ -56,7 +56,17 @@ export async function sendBookingConfirmationEmail(
   const eventDate = formatDateLong(booking.event_date);
   const html = `
     <div style="font-family: Arial, Helvetica, sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
-      <img src="${SITE_URL}/logo-black.png" alt="DW Event Co" width="200" height="99" style="display: block; margin-bottom: 16px;" />
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom: 20px;">
+        <tr>
+          <td style="background-color: #14171a; border-radius: 10px; width: 40px; height: 40px; text-align: center; vertical-align: middle;">
+            <img src="${SITE_URL}/icon-white.png" alt="" width="23" height="20" style="display: block; margin: 10px auto;" />
+          </td>
+          <td style="padding-left: 12px; vertical-align: middle;">
+            <div style="font-size: 18px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #1a1a1a; line-height: 1.2;">DW Event Co</div>
+            <div style="font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: #8a8a8a; line-height: 1.4;">Party &amp; Event Rentals</div>
+          </td>
+        </tr>
+      </table>
       <p>Hi ${booking.customer_name},</p>
       <p>Your booking is confirmed! Here are the details:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
