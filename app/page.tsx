@@ -1,6 +1,8 @@
 import Hero from "./components/Hero";
 import InfoBar from "./components/InfoBar";
 import ImageMarquee from "./components/ImageMarquee";
+import DeliveryAreaMap from "./components/DeliveryAreaMap";
+import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 
 export default function Home() {
@@ -9,6 +11,8 @@ export default function Home() {
       <Hero />
       <InfoBar />
       <ImageMarquee />
+      <DeliveryAreaMap />
+      <FAQSection />
       <Footer />
     </div>
   );
