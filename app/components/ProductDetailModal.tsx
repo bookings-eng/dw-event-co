@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { addToCart } from "@/lib/cart";
 import { lineTotal, rentalDays } from "@/lib/pricing";
 import type { ProductAvailability } from "@/lib/products";
+import DatePickerModal from "./DatePickerModal";
 import ProductIcon from "./ProductIcon";
 
 function formatPrice(price: number): string {
@@ -15,19 +16,24 @@ export default function ProductDetailModal({
   linenProduct,
   startDate,
   endDate,
+  hasDate,
+  onDateChosen,
   open,
   onClose,
 }: {
   product: ProductAvailability;
   linenProduct: ProductAvailability | null;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
+  hasDate: boolean;
+  onDateChosen: (start: string, end: string) => void;
   open: boolean;
   onClose: () => void;
 }) {
   const [qty, setQty] = useState(1);
   const [linenChecked, setLinenChecked] = useState(false);
   const [added, setAdded] = useState(false);
+  const [dateModalOpen, setDateModalOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -40,17 +46,19 @@ export default function ProductDetailModal({
 
   if (!open) return null;
 
-  const unavailable = product.available <= 0;
-  const days = rentalDays(startDate, endDate);
+  const available = product.available ?? 0;
+  const unavailable = hasDate && available <= 0;
+  const days = hasDate ? rentalDays(startDate!, endDate!) : 1;
   const unitTotal = lineTotal(product.price, 1, days);
-  const showLinenOption = product.tableCount > 0 && !!linenProduct;
+  const showLinenOption = hasDate && product.tableCount > 0 && !!linenProduct;
 
   function handleAdd() {
+    if (!hasDate) return;
     addToCart(
       { id: product.id, name: product.name, price: product.price, tag: product.tag },
       qty,
-      startDate,
-      endDate
+      startDate!,
+      endDate!
     );
     if (linenChecked && linenProduct && product.tableCount > 0) {
       addToCart(
@@ -61,8 +69,8 @@ export default function ProductDetailModal({
           tag: linenProduct.tag,
         },
         product.tableCount * qty,
-        startDate,
-        endDate
+        startDate!,
+        endDate!
       );
     }
     setAdded(true);
@@ -108,13 +116,15 @@ export default function ProductDetailModal({
         <div className="max-h-[70vh] overflow-y-auto p-6">
           <div className="flex items-start justify-between gap-3">
             <h2 className="text-xl font-bold text-foreground">{product.name}</h2>
-            <span
-              className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                unavailable ? "bg-black/5 text-foreground/50" : "bg-brand/10 text-brand"
-              }`}
-            >
-              {unavailable ? "Unavailable" : `${product.available} available`}
-            </span>
+            {hasDate && (
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                  unavailable ? "bg-black/5 text-foreground/50" : "bg-brand/10 text-brand"
+                }`}
+              >
+                {unavailable ? "Unavailable" : `${available} available`}
+              </span>
+            )}
           </div>
 
           {product.description && (
@@ -128,9 +138,9 @@ export default function ProductDetailModal({
               {formatPrice(unitTotal)}
             </span>
             <span className="text-sm font-normal text-foreground/50">
-              {days > 1 ? ` for ${days} days` : " / day"}
+              {hasDate && days > 1 ? ` for ${days} days` : " / day"}
             </span>
-            {days > 1 && (
+            {hasDate && days > 1 && (
               <p className="text-xs text-foreground/40">
                 {formatPrice(product.price)} day 1, 50% off each extra day
               </p>
@@ -149,7 +159,15 @@ export default function ProductDetailModal({
             </label>
           )}
 
-          {unavailable ? (
+          {!hasDate ? (
+            <button
+              type="button"
+              onClick={() => setDateModalOpen(true)}
+              className="mt-5 w-full rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            >
+              Check Availability
+            </button>
+          ) : unavailable ? (
             <button
               type="button"
               disabled
@@ -171,7 +189,7 @@ export default function ProductDetailModal({
                 <span className="w-6 text-center text-sm font-medium">{qty}</span>
                 <button
                   type="button"
-                  onClick={() => setQty((q) => Math.min(product.available, q + 1))}
+                  onClick={() => setQty((q) => Math.min(available, q + 1))}
                   aria-label="Increase quantity"
                   className="px-3 py-2 text-foreground/70 transition-colors hover:text-foreground"
                 >
@@ -189,6 +207,14 @@ export default function ProductDetailModal({
           )}
         </div>
       </div>
+      <DatePickerModal
+        open={dateModalOpen}
+        onClose={() => setDateModalOpen(false)}
+        onApply={(newStart, newEnd) => {
+          setDateModalOpen(false);
+          onDateChosen(newStart, newEnd);
+        }}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Header from "./Header";
 import BookNowButton from "./BookNowButton";
 
@@ -20,6 +21,12 @@ export default function Hero() {
           Southlake, Colleyville, Fort Worth, and the surrounding DFW area.
         </p>
         <BookNowButton />
+        <Link
+          href="/products"
+          className="text-sm font-medium text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+        >
+          or Browse Our Rentals
+        </Link>
       </div>
     </section>
   );

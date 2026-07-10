@@ -4,6 +4,7 @@ import { useState } from "react";
 import { addToCart } from "@/lib/cart";
 import { lineTotal, rentalDays } from "@/lib/pricing";
 import type { ProductAvailability } from "@/lib/products";
+import DatePickerModal from "./DatePickerModal";
 import ProductDetailModal from "./ProductDetailModal";
 import ProductIcon from "./ProductIcon";
 
@@ -15,21 +16,29 @@ export default function ProductCard({
   product,
   startDate,
   endDate,
+  hasDate,
+  onDateChosen,
   linenProduct,
 }: {
   product: ProductAvailability;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
+  hasDate: boolean;
+  onDateChosen: (start: string, end: string) => void;
   linenProduct: ProductAvailability | null;
 }) {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-  const unavailable = product.available <= 0;
-  const days = rentalDays(startDate, endDate);
+  const [dateModalOpen, setDateModalOpen] = useState(false);
+
+  const available = product.available ?? 0;
+  const unavailable = hasDate && available <= 0;
+  const days = hasDate ? rentalDays(startDate!, endDate!) : 1;
   const unitTotal = lineTotal(product.price, 1, days);
 
   function handleAdd() {
+    if (!hasDate) return;
     addToCart(
       {
         id: product.id,
@@ -38,8 +47,8 @@ export default function ProductCard({
         tag: product.tag,
       },
       qty,
-      startDate,
-      endDate
+      startDate!,
+      endDate!
     );
     setAdded(true);
     setQty(1);
@@ -72,13 +81,15 @@ export default function ProductCard({
         <div className="flex flex-1 flex-col gap-2 p-4">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-foreground">{product.name}</h3>
-            <span
-              className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                unavailable ? "bg-black/5 text-foreground/50" : "bg-brand/10 text-brand"
-              }`}
-            >
-              {unavailable ? "Unavailable" : `${product.available} available`}
-            </span>
+            {hasDate && (
+              <span
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
+                  unavailable ? "bg-black/5 text-foreground/50" : "bg-brand/10 text-brand"
+                }`}
+              >
+                {unavailable ? "Unavailable" : `${available} available`}
+              </span>
+            )}
           </div>
           {product.description && (
             <p className="line-clamp-2 text-sm text-foreground/60">
@@ -90,16 +101,27 @@ export default function ProductCard({
               {formatPrice(unitTotal)}
             </span>
             <span className="text-sm font-normal text-foreground/50">
-              {days > 1 ? ` for ${days} days` : " / day"}
+              {hasDate && days > 1 ? ` for ${days} days` : " / day"}
             </span>
-            {days > 1 && (
+            {hasDate && days > 1 && (
               <p className="text-xs text-foreground/40">
                 {formatPrice(product.price)} day 1, 50% off each extra day
               </p>
             )}
           </div>
 
-          {unavailable ? (
+          {!hasDate ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDateModalOpen(true);
+              }}
+              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            >
+              Check Availability
+            </button>
+          ) : unavailable ? (
             <button
               type="button"
               disabled
@@ -121,7 +143,7 @@ export default function ProductCard({
                 <span className="w-6 text-center text-sm font-medium">{qty}</span>
                 <button
                   type="button"
-                  onClick={() => setQty((q) => Math.min(product.available, q + 1))}
+                  onClick={() => setQty((q) => Math.min(available, q + 1))}
                   aria-label="Increase quantity"
                   className="px-3 py-1.5 text-foreground/70 transition-colors hover:text-foreground"
                 >
@@ -144,8 +166,18 @@ export default function ProductCard({
         linenProduct={linenProduct}
         startDate={startDate}
         endDate={endDate}
+        hasDate={hasDate}
+        onDateChosen={onDateChosen}
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
+      />
+      <DatePickerModal
+        open={dateModalOpen}
+        onClose={() => setDateModalOpen(false)}
+        onApply={(newStart, newEnd) => {
+          setDateModalOpen(false);
+          onDateChosen(newStart, newEnd);
+        }}
       />
     </>
   );

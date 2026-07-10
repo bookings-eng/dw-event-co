@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { addDaysToKey, dayCount } from "@/lib/date";
+import { addDaysToKey, dayCount, todayKey } from "@/lib/date";
 import { MAX_RENTAL_DAYS } from "@/lib/constants";
 import {
   DELIVERY_FEE,
@@ -46,6 +46,12 @@ export async function POST(request: NextRequest) {
   if (dayCount(startDate, endDate) > MAX_RENTAL_DAYS) {
     return NextResponse.json(
       { error: `Rentals cannot exceed ${MAX_RENTAL_DAYS} days.` },
+      { status: 400 }
+    );
+  }
+  if (startDate <= todayKey()) {
+    return NextResponse.json(
+      { error: "The earliest bookable event date is tomorrow." },
       { status: 400 }
     );
   }
@@ -119,11 +125,14 @@ export async function POST(request: NextRequest) {
     if (!Number.isInteger(item.quantity) || item.quantity < 1) {
       return NextResponse.json({ error: `Invalid quantity for ${product.name}.` }, { status: 400 });
     }
-    if (item.quantity > product.available) {
+    // getProductsForRange always resolves `available` to a number — it's
+    // only null in catalog/browse mode, which never reaches checkout.
+    const available = product.available ?? 0;
+    if (item.quantity > available) {
       return NextResponse.json(
         {
-          error: `Sorry, only ${product.available} of "${product.name}" ${
-            product.available === 1 ? "is" : "are"
+          error: `Sorry, only ${available} of "${product.name}" ${
+            available === 1 ? "is" : "are"
           } available for these dates. Please update your cart.`,
         },
         { status: 422 }

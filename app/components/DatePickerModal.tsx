@@ -39,9 +39,14 @@ export default function DatePickerModal({
   initialStart,
   initialEnd,
 }: DatePickerModalProps) {
-  const today = useMemo(() => startOfDay(new Date()), []);
+  // Earliest bookable day is tomorrow — same-day booking isn't offered.
+  const minDate = useMemo(() => {
+    const d = startOfDay(new Date());
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, []);
   const [visibleMonth, setVisibleMonth] = useState(
-    () => new Date(today.getFullYear(), today.getMonth(), 1)
+    () => new Date(minDate.getFullYear(), minDate.getMonth(), 1)
   );
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
   const [rangeEnd, setRangeEnd] = useState<Date | null>(null);
@@ -87,14 +92,14 @@ export default function DatePickerModal({
     ),
   ];
 
-  const isPast = (date: Date) => date.getTime() < today.getTime();
+  const isPast = (date: Date) => date.getTime() < minDate.getTime();
   const isSameDay = (a: Date, b: Date | null) =>
     !!b && a.getTime() === b.getTime();
 
   const canGoToPrevMonth =
-    firstOfMonth.getFullYear() > today.getFullYear() ||
-    (firstOfMonth.getFullYear() === today.getFullYear() &&
-      firstOfMonth.getMonth() > today.getMonth());
+    firstOfMonth.getFullYear() > minDate.getFullYear() ||
+    (firstOfMonth.getFullYear() === minDate.getFullYear() &&
+      firstOfMonth.getMonth() > minDate.getMonth());
 
   const hasCompletedRange = !!(
     rangeStart &&
@@ -162,7 +167,8 @@ export default function DatePickerModal({
         </div>
         <p className="mb-3 text-xs text-foreground/50">
           Click a day for a single-day rental, or click a start and end day for
-          multiple days (up to {MAX_RENTAL_DAYS} days).
+          multiple days (up to {MAX_RENTAL_DAYS} days). Earliest booking is
+          tomorrow.
         </p>
 
         <div className="mb-3 flex items-center justify-between">

@@ -20,16 +20,18 @@ export default function ProductsClient({
   initialEnd,
   initialGroups,
 }: {
-  initialStart: string;
-  initialEnd: string;
+  initialStart: string | null;
+  initialEnd: string | null;
   initialGroups: ProductGroups;
 }) {
-  const [start, setStart] = useState(initialStart);
-  const [end, setEnd] = useState(initialEnd);
+  const [start, setStart] = useState<string | null>(initialStart);
+  const [end, setEnd] = useState<string | null>(initialEnd);
   const [groups, setGroups] = useState(initialGroups);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const cart = useCart();
+
+  const hasDate = start !== null && end !== null;
 
   const handleChangeRange = useCallback(
     async (newStart: string, newEnd: string) => {
@@ -76,7 +78,12 @@ export default function ProductsClient({
 
   return (
     <div className="flex min-h-full flex-1 flex-col">
-      <ProductsBanner start={start} end={end} onChangeRange={handleChangeRange} />
+      <ProductsBanner
+        start={start}
+        end={end}
+        hasDate={hasDate}
+        onChangeRange={handleChangeRange}
+      />
       <div className="products-backdrop relative flex-1">
         <main
           className={`relative mx-auto w-full max-w-6xl px-4 py-10 transition-opacity sm:px-6 ${
@@ -96,6 +103,8 @@ export default function ProductsClient({
                       product={product}
                       startDate={start}
                       endDate={end}
+                      hasDate={hasDate}
+                      onDateChosen={handleChangeRange}
                       linenProduct={linenProduct}
                     />
                   ))}

@@ -17,8 +17,8 @@ export const metadata: Metadata = {
   description:
     "Party and event equipment rentals delivered to Keller, Southlake, Colleyville, Fort Worth, and surrounding areas. Book online in minutes.",
   icons: {
-    icon: "/icon-black.png",
-    apple: "/icon-black.png",
+    icon: "/favicon-badge.png",
+    apple: "/favicon-badge.png",
   },
 };
 
