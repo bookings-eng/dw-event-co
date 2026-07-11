@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import { getProductsCatalog, getProductsForRange } from "@/lib/products";
 import ProductsClient from "./ProductsClient";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+export const metadata: Metadata = {
+  title: "Table & Chair Rentals in Keller, Southlake & Fort Worth, TX",
+  description:
+    "Browse party and event rentals — tables, chairs, bundles, and kids' furniture — available for delivery to Keller, Southlake, Colleyville, Trophy Club, Fort Worth, and nearby DFW areas. Check live availability and book online.",
+  alternates: {
+    canonical: "/products",
+  },
+};
 
 export default async function ProductsPage({
   searchParams,

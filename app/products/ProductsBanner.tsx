@@ -29,7 +29,7 @@ export default function ProductsBanner({
       <Header overlay />
       <div className="relative z-10 flex flex-col items-center gap-3">
         <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Browse Our Rentals
+          Party &amp; Event Rentals for the DFW Area
         </h1>
         <div className="flex flex-wrap items-center justify-center gap-2 text-white/90">
           <span>

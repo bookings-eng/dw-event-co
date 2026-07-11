@@ -12,9 +12,9 @@ export default function Hero() {
       }}
     >
       <Header overlay showCart />
-      <div className="relative z-10 flex max-w-2xl flex-col items-center gap-6">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-6xl">
-          Get a Quote Instantly!
+      <div className="relative z-10 flex max-w-3xl flex-col items-center gap-6">
+        <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-5xl md:text-6xl">
+          Party &amp; Event Rentals in Keller, TX — Get a Quote Instantly!
         </h1>
         <p className="max-w-xl text-base text-white/90 sm:text-lg">
           Party and event equipment, delivered right to your door in Keller,

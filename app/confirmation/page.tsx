@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { finalizeBookingPayment } from "@/lib/bookings";
 import { formatDateLong } from "@/lib/date";
@@ -5,6 +6,11 @@ import { getStripe } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import Header from "../components/Header";
 import ClearCartOnLoad from "./ClearCartOnLoad";
+
+export const metadata: Metadata = {
+  title: "Booking Confirmation",
+  robots: { index: false, follow: false },
+};
 
 export default async function ConfirmationPage({
   searchParams,

@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import Header from "../components/Header";
 import AdminLoginForm from "./AdminLoginForm";
 import AdminLogoutButton from "./AdminLogoutButton";
 import AdminBookingsTable, { type AdminBooking } from "./AdminBookingsTable";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminPage() {
   const authenticated = await isAdminAuthenticated();
