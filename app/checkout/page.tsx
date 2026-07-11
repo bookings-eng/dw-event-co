@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import CartSummary from "./CartSummary";
 import { useCart } from "@/hooks/useCart";
+import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
 import { cartDays, cartSubtotal, removeFromCart } from "@/lib/cart";
 import { DELIVERY_FEE, DEPOSIT_RATE } from "@/lib/constants";
 
@@ -31,6 +32,42 @@ export default function CheckoutPage() {
   const [payError, setPayError] = useState<string | null>(null);
 
   const [availabilityById, setAvailabilityById] = useState<Map<string, number> | null>(null);
+
+  const address1Ref = useRef<HTMLInputElement>(null);
+  const autocompleteAttachedRef = useRef(false);
+  const mapsLoaded = useGoogleMapsScript(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+
+  useEffect(() => {
+    if (!mapsLoaded || !address1Ref.current || !window.google) return;
+    if (autocompleteAttachedRef.current) return;
+    autocompleteAttachedRef.current = true;
+
+    const autocomplete = new window.google.maps.places.Autocomplete(address1Ref.current, {
+      componentRestrictions: { country: "us" },
+      fields: ["address_components"],
+      types: ["address"],
+    });
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      const components = place.address_components ?? [];
+      const get = (type: string) => components.find((c) => c.types.includes(type));
+
+      const streetNumber = get("street_number")?.long_name ?? "";
+      const route = get("route")?.long_name ?? "";
+      const cityName =
+        get("locality")?.long_name ?? get("sublocality")?.long_name ?? "";
+      const stateName = get("administrative_area_level_1")?.short_name ?? "";
+      const zipName = get("postal_code")?.long_name ?? "";
+
+      setAddress1([streetNumber, route].filter(Boolean).join(" "));
+      setCity(cityName);
+      setState(stateName);
+      setZip(zipName);
+      setAddressResult(null);
+      setValidationError(null);
+    });
+  }, [mapsLoaded]);
 
   useEffect(() => {
     if (!cart.startDate || !cart.endDate || cart.items.length === 0) return;
@@ -192,7 +229,10 @@ export default function CheckoutPage() {
                 <label className="flex flex-col gap-1 text-sm sm:col-span-2">
                   Address Line 1
                   <input
+                    ref={address1Ref}
                     type="text"
+                    autoComplete="off"
+                    placeholder="Start typing your address…"
                     value={address1}
                     onChange={handleAddressFieldChange(setAddress1)}
                     className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
