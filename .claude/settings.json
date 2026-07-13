@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{ "type": "command", "command": "node .claude/hooks/protect-env.js" }]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "node .claude/hooks/protect-env.js" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{
+          "type": "command",
+          "command": "node .claude/hooks/check-ts.js",
+          "async": true,
+          "asyncRewake": true,
+          "timeout": 120,
+          "statusMessage": "Linting & type-checking…"
+        }]
+      }
+    ]
+  }
+}
