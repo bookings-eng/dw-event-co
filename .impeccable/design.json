@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-12T00:00:00Z",
+  "title": "Design System: DW Event Co",
+  "extensions": {
+    "colorMeta": {
+      "brand-green": {
+        "role": "primary",
+        "displayName": "Fresh Grass Green",
+        "canonical": "#209d50",
+        "tonalRamp": ["#0b3d1f", "#0f5029", "#187a3d", "#209d50", "#3dbd6c", "#6fd394", "#a8e7c0", "#dcf5e6"]
+      },
+      "brand-green-deep": {
+        "role": "primary-deep",
+        "displayName": "Fresh Grass Green, Deep",
+        "canonical": "#187a3d",
+        "tonalRamp": ["#08301a", "#0c3f22", "#187a3d", "#1f9a4d", "#3ab567", "#6cce8e", "#a4e2ba", "#d9f2e2"]
+      },
+      "soft-linen": {
+        "role": "neutral-bg",
+        "displayName": "Soft Linen",
+        "canonical": "#f5f5f3",
+        "tonalRamp": ["#332f28", "#4d473d", "#736b5c", "#a39a89", "#c9c0b0", "#e2ddd2", "#f5f5f3", "#fbfbfa"]
+      },
+      "charcoal-ink": {
+        "role": "neutral-text",
+        "displayName": "Charcoal Text",
+        "canonical": "#1a1a1a",
+        "tonalRamp": ["#000000", "#141414", "#1a1a1a", "#333333", "#595959", "#808080", "#b3b3b3", "#e6e6e6"]
+      },
+      "near-black": {
+        "role": "neutral-deep",
+        "displayName": "Near-Black",
+        "canonical": "#14171a",
+        "tonalRamp": ["#000000", "#0a0c0d", "#14171a", "#2a2f33", "#484f55", "#6d757c", "#9aa1a6", "#cdd1d4"]
+      },
+      "surface-white": {
+        "role": "surface",
+        "displayName": "Surface White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#cccccc", "#dddddd", "#eeeeee", "#f5f5f5", "#fafafa", "#fcfcfc", "#ffffff", "#ffffff"]
+      },
+      "backdrop-warm": {
+        "role": "decorative-surface",
+        "displayName": "Backdrop Warm",
+        "canonical": "#f5f4ed",
+        "tonalRamp": ["#332f24", "#4d473a", "#736b57", "#a39c84", "#c9c2ab", "#e2ded2", "#f5f4ed", "#fbfaf7"]
+      },
+      "status-pending-bg": {
+        "role": "status-bg",
+        "displayName": "Pending — Background",
+        "canonical": "#fef9c3",
+        "tonalRamp": ["#4d4310", "#736519", "#a89325", "#d4bf35", "#f0dc60", "#f8ea96", "#fef9c3", "#fffce3"]
+      },
+      "status-pending-text": {
+        "role": "status-text",
+        "displayName": "Pending — Text",
+        "canonical": "#854d0e",
+        "tonalRamp": ["#2b1804", "#432506", "#673909", "#854d0e", "#a86a25", "#c78c4b", "#dfb182", "#f0d8ba"]
+      },
+      "status-alert": {
+        "role": "status-alert",
+        "displayName": "Alert",
+        "canonical": "#dc2626",
+        "tonalRamp": ["#4d0a0a", "#731010", "#a81717", "#dc2626", "#e6544f", "#ef8583", "#f7b8b6", "#fbdcdb"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Homepage hero headline only." },
+      "headline": { "displayName": "Headline", "purpose": "Section and page titles." },
+      "title": { "displayName": "Title", "purpose": "Card, modal, and product titles." },
+      "body": { "displayName": "Body", "purpose": "Default UI and copy text; muted via opacity steps." },
+      "label": { "displayName": "Label", "purpose": "Small uppercase structural markers, used sparingly." }
+    },
+    "shadows": [
+      { "name": "resting-card", "value": "0 1px 2px rgba(0,0,0,0.05)", "purpose": "Default card/panel state." },
+      { "name": "hover-lift", "value": "0 4px 6px rgba(0,0,0,0.07)", "purpose": "Card hover state, paired with transition-shadow." },
+      { "name": "hero-cta", "value": "0 10px 15px rgba(0,0,0,0.1)", "purpose": "Hero CTA button, needs to pop off a photo background." },
+      { "name": "modal", "value": "0 20px 25px rgba(0,0,0,0.1)", "purpose": "Dialog/modal panels, paired with a bg-black/50 scrim." }
+    ],
+    "motion": [
+      { "name": "color-transition", "value": "transition-colors (default duration/easing)", "purpose": "Button and link hover states — color only, no transform." },
+      { "name": "shadow-transition", "value": "transition-shadow (default duration/easing)", "purpose": "Card hover lift." },
+      { "name": "accordion-ease", "value": "300ms ease-in-out, grid-template-rows 0fr -> 1fr", "purpose": "FAQ accordion expand/collapse." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Standard-size pill CTA — Add to Cart, Apply, Check Availability.",
+      "html": "<button class=\"ds-btn-primary\">Add to Cart</button>",
+      "css": ".ds-btn-primary { background: #209d50; color: #ffffff; border-radius: 9999px; padding: 8px 16px; font-size: 0.875rem; font-weight: 600; border: none; transition: background-color 0.2s; } .ds-btn-primary:hover { background: #187a3d; } .ds-btn-primary:focus-visible { outline: 2px solid #187a3d; outline-offset: 2px; } .ds-btn-primary:disabled { background: rgba(0,0,0,0.05); color: rgba(26,26,26,0.4); cursor: not-allowed; }"
+    },
+    {
+      "name": "Hero CTA Button",
+      "kind": "button",
+      "refersTo": "button-primary-large",
+      "description": "Large pill CTA used once per page, over the homepage hero photo — Book Now.",
+      "html": "<button class=\"ds-btn-hero\">Book Now</button>",
+      "css": ".ds-btn-hero { background: #209d50; color: #ffffff; border-radius: 9999px; padding: 16px 32px; font-size: 1.125rem; font-weight: 600; border: none; box-shadow: 0 10px 15px rgba(0,0,0,0.1); transition: background-color 0.2s; } .ds-btn-hero:hover { background: #187a3d; }"
+    },
+    {
+      "name": "Ghost Icon Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent circular button for close/nav/cart icons.",
+      "html": "<button class=\"ds-btn-ghost\" aria-label=\"Close\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" width=\"20\" height=\"20\"><path stroke-linecap=\"round\" d=\"M6 6l12 12M18 6L6 18\"/></svg></button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; background: transparent; color: rgba(26,26,26,0.5); border: none; border-radius: 9999px; padding: 8px; transition: background-color 0.2s, color 0.2s; } .ds-btn-ghost:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; }"
+    },
+    {
+      "name": "Availability Badge",
+      "kind": "chip",
+      "refersTo": "badge-brand",
+      "description": "Pill badge showing live stock — '4 available'.",
+      "html": "<span class=\"ds-badge-brand\">4 available</span>",
+      "css": ".ds-badge-brand { display: inline-block; background: #e9f5ee; color: #209d50; border-radius: 9999px; padding: 4px 10px; font-size: 0.75rem; font-weight: 500; }"
+    },
+    {
+      "name": "Muted Badge",
+      "kind": "chip",
+      "refersTo": "badge-muted",
+      "description": "Pill badge for a neutral/unavailable state.",
+      "html": "<span class=\"ds-badge-muted\">Unavailable</span>",
+      "css": ".ds-badge-muted { display: inline-block; background: rgba(0,0,0,0.05); color: rgba(26,26,26,0.5); border-radius: 9999px; padding: 4px 10px; font-size: 0.75rem; font-weight: 500; }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Catalog card — image, name, availability, price, primary action.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-media\">🪑</div><div class=\"ds-card-body\"><h3 class=\"ds-card-title\">Folding Chair</h3><p class=\"ds-card-price\">$2 <span>/ day</span></p><button class=\"ds-btn-primary\">Add to Cart</button></div></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 16px; background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: box-shadow 0.2s; } .ds-card:hover { box-shadow: 0 4px 6px rgba(0,0,0,0.07); } .ds-card-media { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; background: rgba(32,157,80,0.1); font-size: 2rem; } .ds-card-body { display: flex; flex-direction: column; gap: 8px; padding: 16px; } .ds-card-title { font-size: 1rem; font-weight: 600; color: #1a1a1a; margin: 0; } .ds-card-price { font-size: 1.125rem; font-weight: 700; color: #1a1a1a; margin: 0; } .ds-card-price span { font-size: 0.875rem; font-weight: 400; color: rgba(26,26,26,0.5); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Checkout form field — label above, hairline border, green focus border.",
+      "html": "<label class=\"ds-field\">Full Name<input class=\"ds-input\" type=\"text\" placeholder=\"Jane Doe\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; font-size: 0.875rem; color: #1a1a1a; } .ds-input { border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); padding: 8px 12px; font-size: 0.875rem; color: #1a1a1a; background: #ffffff; } .ds-input:focus { border-color: #209d50; outline: none; }"
+    },
+    {
+      "name": "Solid Header",
+      "kind": "nav",
+      "refersTo": "nav-header",
+      "description": "Sticky interior-page header — wordmark, kicker, cart icon.",
+      "html": "<header class=\"ds-header\"><span class=\"ds-header-mark\">DW EVENT CO<small>Party &amp; Event Rentals</small></span><button class=\"ds-btn-ghost\" aria-label=\"Cart\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" width=\"22\" height=\"22\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M3 3h1.5l2.4 12.6a1.5 1.5 0 001.48 1.4h8.44a1.5 1.5 0 001.48-1.24L20 8H6\"/></svg></button></header>",
+      "css": ".ds-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(0,0,0,0.05); } .ds-header-mark { display: flex; flex-direction: column; line-height: 1; font-weight: 800; font-size: 1.125rem; text-transform: uppercase; letter-spacing: 0.02em; color: #1a1a1a; } .ds-header-mark small { font-size: 0.625rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(26,26,26,0.5); }"
+    },
+    {
+      "name": "Modal Dialog",
+      "kind": "custom",
+      "refersTo": "modal",
+      "description": "Centered white dialog over a dark scrim — date picker, product detail.",
+      "html": "<div class=\"ds-modal-scrim\"><div class=\"ds-modal\"><h2 class=\"ds-modal-title\">Choose your event date</h2><p>Modal content goes here.</p></div></div>",
+      "css": ".ds-modal-scrim { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 16px; } .ds-modal { width: 100%; max-width: 24rem; border-radius: 16px; background: #ffffff; padding: 20px; box-shadow: 0 20px 25px rgba(0,0,0,0.1); } .ds-modal-title { font-size: 1.125rem; font-weight: 700; color: #1a1a1a; margin: 0 0 16px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Front Porch Handoff",
+    "overview": "DW Event Co's interface should feel like a neighbor showing up with exactly what you asked for, on time, with a smile — not a faceless checkout flow. Every surface stays soft-edged and legible: pill-shaped buttons, gently rounded cards, a warm neutral canvas, and one confident brand green used to mark the actions and states that matter (availability, primary CTAs, active selections). The system is deliberately unglamorous in its neutrals so the green — and the words next to it — can do the work. This build inherits the live flow of dweventco.com (hero with date picker -> browse/quote -> checkout) and should refine that path rather than restructure it. The system explicitly rejects a faceless-marketplace or generic-SaaS feel: no cold corporate grids, no manufactured trust badges standing in for real proof, no visual flourish that doesn't help someone get from 'I need chairs for Saturday' to a booked, paid order.",
+    "keyCharacteristics": [
+      "Pill-shaped controls (buttons, badges, calendar cells, the cart icon) as the dominant interactive shape",
+      "Rounded-corner cards (16px) on a soft, low-chroma neutral canvas",
+      "One saturated brand green, used sparingly and consistently for actions, availability, and active state",
+      "Gentle shadow lift on hover rather than heavy layering — depth is a hint, not a statement",
+      "Text hierarchy built from opacity steps on a single ink color, not a palette of grays"
+    ],
+    "rules": [
+      { "name": "The One Green Rule", "body": "Fresh Grass Green appears only on things a user can act on or that report live availability. It never appears as pure decoration, with one deliberate exception: the blurred brand-green glows in the Footer and Products backdrop, kept at low opacity (<=20%) so they read as atmosphere, not accent.", "section": "colors" },
+      { "name": "The Opacity-Not-Gray Rule", "body": "Secondary and tertiary text is Charcoal Text at reduced opacity, never a separate named gray.", "section": "typography" },
+      { "name": "The Ambient-Not-Architectural Rule", "body": "Shadows communicate 'touchable' or 'above everything else' — never used to fake a layered surface system.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Fresh Grass Green tied to action and availability — buttons, active states, 'in stock,' cart count.",
+      "Do use the pill shape (9999px) for every tappable control, and reserve the 16px card radius for containers you read rather than tap.",
+      "Do build secondary/muted text from opacity on Charcoal Text (/40 through /80), not a separate gray scale.",
+      "Do keep new dialogs and overlays inside the existing modal pattern (dark scrim + white rounded-2xl panel).",
+      "Do preserve the existing site flow — hero with date picker -> browse/quote -> checkout — when extending or restyling pages.",
+      "Do lean on transparent pricing and a clearly stated service area as trust signals until real testimonials exist."
+    ],
+    "donts": [
+      "Don't introduce a second accent color without flagging it as a deliberate decision.",
+      "Don't spread the uppercase-tracked label pattern onto every section — it's an occasional structural marker, not a standing kicker.",
+      "Don't use border-left/border-right colored stripes as a card or list accent.",
+      "Don't use gradient text.",
+      "Don't use glassmorphism/backdrop-blur as a default card treatment — the solid sticky header is the one approved use.",
+      "Don't darken the neutral background toward a heavier cream/tan — Soft Linen stays close to neutral gray.",
+      "Don't stack multiple shadows or add Material-style tonal surface layers."
+    ]
+  }
+}
