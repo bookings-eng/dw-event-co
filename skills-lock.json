@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "781bd6d3f9b19f8c9af6b53d8d0e4876d0183841b565db34ca7092ffa412d111"
+    },
+    "playwright": {
+      "source": "bobmatnyc/claude-mpm-skills",
+      "sourceType": "github",
+      "skillPath": "toolchains/javascript/testing/playwright/SKILL.md",
+      "computedHash": "003fc7f5ee2ba795786f4f5689900be32fcdf53a834777512091ac1192274c07"
     }
   }
 }
