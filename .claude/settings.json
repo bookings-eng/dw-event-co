@@ -7,7 +7,23 @@
       },
       {
         "matcher": "Bash",
-        "hooks": [{ "type": "command", "command": "node .claude/hooks/protect-env.js" }]
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/protect-env.js" },
+          {
+            "type": "agent",
+            "if": "Bash(git commit*)",
+            "timeout": 180,
+            "statusMessage": "Security review of staged payment/auth changes…",
+            "prompt": "You are gating a `git commit` in dw-event-co (Next.js app handling live Stripe payments and Supabase data). First run `git diff --cached --name-only` to see staged files. Sensitive paths: app/api/checkout/**, app/api/webhooks/**, app/api/admin/**, app/admin/**, lib/stripe.ts, lib/supabase/admin.ts, lib/adminAuth.ts, and lib/bookings.ts when called from the above. If none of these are staged, respond only with: {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n\nIf any are staged, run `git diff --cached` on those files and act as an adversarial security reviewer. Check specifically: (1) Stripe webhook signature verification runs on the raw body via constructEvent before trusting event data; (2) webhook handlers are idempotent for repeat Stripe deliveries (no double-charge/duplicate side effects); (3) every admin route/page calls isAdminAuthenticated() before touching admin data; (4) SUPABASE_SERVICE_ROLE_KEY / getSupabaseAdmin() never reaches client code (\"use client\" files or props serialized to the client); (5) charged amounts are computed server-side, never trusted from client-submitted input; (6) no hardcoded sk_live_/sk_test_/whsec_/service-role keys outside .env.local; (7) error responses don't leak internal details. Never print a secret's actual value in your output — mask to prefix+**** and cite file:line instead.\n\nIf you find a Critical or High severity issue, respond with ONLY this JSON (nothing else): {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"<one-line summary with file:line per issue>\"}}\n\nOtherwise respond with ONLY this JSON: {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\", \"permissionDecisionReason\": \"<any Medium/Low notes, or empty>\"}}"
+          },
+          {
+            "type": "agent",
+            "if": "Bash(git push*)",
+            "timeout": 180,
+            "statusMessage": "Pre-deploy check before push to main…",
+            "prompt": "You are gating a `git push` in dw-event-co. First run `git rev-parse --abbrev-ref HEAD` and inspect the push command for an explicit branch argument. If neither the current branch nor an explicit push target is `main`, respond with ONLY this JSON: {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n\nIf targeting main, run every one of these steps, even if an earlier one fails: 1) Lint: node node_modules/eslint/bin/eslint.js . 2) Typecheck: node node_modules/typescript/bin/tsc --noEmit --incremental 3) Stripe webhook config: node .claude/skills/pre-deploy-check/verify-webhook-env.mjs 4) .env.local not staged: git status --porcelain -- .env.local ; git diff --cached --name-only ; git diff --cached | grep -E \"sk_live_|whsec_|SUPABASE_SERVICE_ROLE_KEY|-----BEGIN\" (any match is a blocking failure).\n\nIf all four pass, respond with ONLY this JSON: {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"allow\"}}\n\nIf any fail, respond with ONLY this JSON: {\"hookSpecificOutput\": {\"hookEventName\": \"PreToolUse\", \"permissionDecision\": \"deny\", \"permissionDecisionReason\": \"<which check(s) failed and why>\"}}"
+          }
+        ]
       }
     ],
     "PostToolUse": [
