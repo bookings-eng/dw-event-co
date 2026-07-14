@@ -1,4 +1,16 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git rev-parse*)",
+      "Bash(git log*)",
+      "Bash(node node_modules/eslint/bin/eslint.js*)",
+      "Bash(node node_modules/typescript/bin/tsc*)",
+      "Bash(node .claude/skills/pre-deploy-check/verify-webhook-env.mjs*)",
+      "Bash(grep*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
