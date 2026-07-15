@@ -57,7 +57,7 @@ export default function ImageMarquee() {
       <div className="relative">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-32" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:w-32" />
-        <div className="flex w-max animate-marquee gap-4 sm:gap-6">
+        <div className="marquee-track flex w-max animate-marquee gap-4 sm:gap-6">
           {track.map((image, i) => (
             <div
               key={`${image.file}-${i}`}

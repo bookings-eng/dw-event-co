@@ -13,17 +13,26 @@ export default function Hero() {
     >
       <Header overlay showCart />
       <div className="relative z-10 flex max-w-3xl flex-col items-center gap-6">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-5xl md:text-6xl">
+        <h1
+          className="hero-reveal text-4xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-5xl md:text-6xl"
+        >
           Get a Quote Instantly!
         </h1>
-        <p className="max-w-xl text-base text-white/90 sm:text-lg">
-          Party and event equipment, delivered right to your door in Keller,
-          Southlake, Colleyville, Fort Worth, and the surrounding DFW area.
+        <p
+          className="hero-reveal max-w-xl text-base text-white/90 sm:text-lg"
+          style={{ animationDelay: "120ms" }}
+        >
+          Premium tables and chairs, ready for your next event in Keller,
+          Southlake, Colleyville, NRH, Trophy Club and the surrounding north
+          Fort Worth area.
         </p>
-        <BookNowButton />
+        <div className="hero-reveal" style={{ animationDelay: "220ms" }}>
+          <BookNowButton />
+        </div>
         <Link
           href="/products"
-          className="text-sm font-medium text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+          className="hero-reveal text-sm font-medium text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+          style={{ animationDelay: "300ms" }}
         >
           or Browse Our Rentals
         </Link>

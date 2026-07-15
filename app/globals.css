@@ -37,24 +37,87 @@ body {
   animation: marquee-scroll 110s linear infinite;
 }
 
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-reveal {
+  animation: hero-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+
+  .hero-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /*
- * Products page backdrop: a warm-to-cool diagonal base wash, a handful of
- * soft brand-green ellipses distributed by percentage (so they spread
- * across the full scrollable height, not just the first screen), and a
- * faint brand-green dot grid for tactile texture. All percentage-based —
- * no fixed positioning or JS needed to cover a page of any length.
+ * Products page backdrop: the banner above ends in a dark #14311d wash, so
+ * the backdrop opens with a matching dark-to-cream fade before settling into
+ * a warm diagonal base wash and a handful of soft brand-green ellipses
+ * distributed by percentage (so they spread across the full scrollable
+ * height, not just the first screen). All percentage-based — no fixed
+ * positioning or JS needed to cover a page of any length.
+ *
+ * The tactile texture (a woven linen pin-dot, standing in for the linens
+ * this business rents) lives on ::before below, so its slow drift can
+ * animate independently of this static layer.
  */
 .products-backdrop {
   background-color: #f5f4ed;
   background-image:
+    linear-gradient(180deg, #14311d 0%, rgba(20, 49, 29, 0.4) 90px, rgba(20, 49, 29, 0) 220px),
     radial-gradient(720px 520px at 8% 6%, rgba(32, 157, 80, 0.20), transparent 60%),
     radial-gradient(600px 520px at 94% 26%, rgba(32, 157, 80, 0.15), transparent 60%),
     radial-gradient(640px 560px at 6% 56%, rgba(32, 157, 80, 0.15), transparent 60%),
     radial-gradient(700px 600px at 96% 78%, rgba(32, 157, 80, 0.18), transparent 60%),
     radial-gradient(560px 480px at 12% 97%, rgba(32, 157, 80, 0.14), transparent 60%),
-    radial-gradient(rgba(32, 157, 80, 0.28) 1.3px, transparent 2px),
     linear-gradient(160deg, #faf9f3 0%, #f4f4ec 45%, #ebefe4 100%);
-  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat, no-repeat;
-  background-size: auto, auto, auto, auto, auto, 26px 26px, auto;
+  background-repeat: no-repeat;
   box-shadow: inset 0 16px 28px -24px rgba(20, 23, 26, 0.24);
+}
+
+.products-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(rgba(32, 157, 80, 0.26) 1px, transparent 1.6px),
+    radial-gradient(rgba(32, 157, 80, 0.16) 1px, transparent 1.6px);
+  background-size: 15px 15px, 15px 15px;
+  background-position: 0 0, 7px 7px;
+  animation: linen-drift 240s linear infinite;
+}
+
+@keyframes linen-drift {
+  from {
+    background-position: 0 0, 7px 7px;
+  }
+  to {
+    background-position: 15px 15px, 22px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .products-backdrop::before {
+    animation: none;
+  }
 }
