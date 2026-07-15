@@ -51,19 +51,25 @@ export default function DatePickerModal({
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
   const [rangeEnd, setRangeEnd] = useState<Date | null>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    if (initialStart) {
-      const s = parseDateKey(initialStart);
-      const e = initialEnd ? parseDateKey(initialEnd) : s;
-      setRangeStart(s);
-      setRangeEnd(e);
-      setVisibleMonth(new Date(s.getFullYear(), s.getMonth(), 1));
-    } else {
-      setRangeStart(null);
-      setRangeEnd(null);
+  // Re-sync range/month from props each time the modal opens, discarding
+  // any in-progress edits from a prior open/close cycle. Done during render
+  // (not an effect) per React's guidance on adjusting state from props.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      if (initialStart) {
+        const s = parseDateKey(initialStart);
+        const e = initialEnd ? parseDateKey(initialEnd) : s;
+        setRangeStart(s);
+        setRangeEnd(e);
+        setVisibleMonth(new Date(s.getFullYear(), s.getMonth(), 1));
+      } else {
+        setRangeStart(null);
+        setRangeEnd(null);
+      }
     }
-  }, [open, initialStart, initialEnd]);
+  }
 
   useEffect(() => {
     if (!open) return;
