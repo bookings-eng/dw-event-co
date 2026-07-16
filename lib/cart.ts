@@ -19,17 +19,25 @@ export const CART_EVENT = "dw-cart-change";
 
 const EMPTY_CART: Cart = { startDate: null, endDate: null, items: [] };
 
+// Cached by raw string so repeated calls return the same reference when
+// localStorage hasn't changed — required by useSyncExternalStore, which
+// treats any new reference as a store change and would otherwise loop.
+let cachedRaw: string | null = null;
+let cachedCart: Cart = EMPTY_CART;
+
 export function getCart(): Cart {
   if (typeof window === "undefined") return EMPTY_CART;
+  const raw = window.localStorage.getItem(CART_KEY);
+  if (raw === cachedRaw) return cachedCart;
+  cachedRaw = raw;
+  if (!raw) return (cachedCart = EMPTY_CART);
   try {
-    const raw = window.localStorage.getItem(CART_KEY);
-    if (!raw) return EMPTY_CART;
     const parsed = JSON.parse(raw);
-    if (!parsed || !Array.isArray(parsed.items)) return EMPTY_CART;
-    return parsed as Cart;
+    cachedCart = !parsed || !Array.isArray(parsed.items) ? EMPTY_CART : (parsed as Cart);
   } catch {
-    return EMPTY_CART;
+    cachedCart = EMPTY_CART;
   }
+  return cachedCart;
 }
 
 function saveCart(cart: Cart) {
