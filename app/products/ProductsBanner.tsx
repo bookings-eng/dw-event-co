@@ -22,10 +22,10 @@ export default function ProductsBanner({
     <section className="relative flex min-h-[320px] flex-col items-center justify-center px-4 py-16 text-center sm:min-h-[380px]">
       <Header overlay />
       <div className="relative z-10 flex flex-col items-center gap-3">
-        <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
+        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
           Party &amp; Event Rentals for the DFW Area
         </h1>
-        <div className="flex flex-wrap items-center justify-center gap-2 text-white/90">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-base text-white/90 sm:text-lg">
           <span>
             {hasDate
               ? `Showing availability for ${formatRangeLabel(start!, end!)}`

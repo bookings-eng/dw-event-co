@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import CartSummary from "./CartSummary";
 import { useCart } from "@/hooks/useCart";
 import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
-import { cartDays, cartSubtotal, removeFromCart, type Cart } from "@/lib/cart";
+import { cartDays, cartSubtotal, removeFromCart, updateCartQuantity, type Cart } from "@/lib/cart";
 import { DELIVERY_FEE, DEPOSIT_RATE } from "@/lib/constants";
 
 type AddressResult = { lat: number; lng: number; distanceMiles: number };
@@ -380,6 +380,7 @@ export default function CheckoutPage() {
               deliveryConfirmed={!!addressResult}
               availabilityById={availabilityById}
               onRemove={removeFromCart}
+              onUpdateQuantity={updateCartQuantity}
             />
           </div>
         </div>

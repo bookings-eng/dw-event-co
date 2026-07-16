@@ -70,6 +70,17 @@ export function addToCart(
   saveCart({ startDate, endDate, items });
 }
 
+export function updateCartQuantity(productId: string, quantity: number) {
+  const cart = getCart();
+  const clamped = Math.max(1, quantity);
+  saveCart({
+    ...cart,
+    items: cart.items.map((item) =>
+      item.productId === productId ? { ...item, quantity: clamped } : item
+    ),
+  });
+}
+
 export function removeFromCart(productId: string) {
   const cart = getCart();
   saveCart({
