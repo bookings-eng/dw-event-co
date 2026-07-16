@@ -284,17 +284,6 @@ export default function CheckoutPage() {
                   below.
                 </p>
               )}
-
-              {!addressResult && (
-                <button
-                  type="button"
-                  disabled={!addressFilled || validating}
-                  onClick={handleValidateAddress}
-                  className="mt-5 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {validating ? "Checking address…" : "Continue to Payment"}
-                </button>
-              )}
             </section>
 
             <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
@@ -328,6 +317,17 @@ export default function CheckoutPage() {
                   />
                 </label>
               </div>
+
+              {!addressResult && (
+                <button
+                  type="button"
+                  disabled={!addressFilled || validating}
+                  onClick={handleValidateAddress}
+                  className="mt-5 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {validating ? "Checking address…" : "Continue to Payment"}
+                </button>
+              )}
             </section>
 
             {hasAvailabilityIssues && (
