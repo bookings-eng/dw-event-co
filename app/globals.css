@@ -76,6 +76,109 @@ body {
  * constant scale no matter how tall the product grid gets. A flat dark
  * green tint sits on top for contrast with the white cards and headings.
  */
+/*
+ * Legal document rendering (rental agreement, privacy, terms). Markdown is
+ * rendered to raw HTML via `marked` and injected with dangerouslySetInnerHTML
+ * (trusted, author-owned source files), so these are the only styles that
+ * shape it. Tables must stay readable on a phone — cancellation table and
+ * replacement-cost schedule live here — so every table scrolls horizontally
+ * inside its own wrapper rather than squeezing or overflowing the page.
+ */
+.legal-prose {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--foreground);
+}
+
+.legal-prose h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2rem 0 1rem;
+}
+
+.legal-prose h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 2rem 0 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.legal-prose h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.legal-prose p,
+.legal-prose ul,
+.legal-prose ol {
+  margin: 0 0 1rem;
+}
+
+.legal-prose ul,
+.legal-prose ol {
+  padding-left: 1.5rem;
+}
+
+.legal-prose li {
+  margin-bottom: 0.35rem;
+}
+
+.legal-prose blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--brand);
+  background: rgba(32, 157, 80, 0.06);
+  color: rgba(26, 26, 26, 0.8);
+}
+
+.legal-prose hr {
+  margin: 2rem 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.legal-prose strong {
+  font-weight: 700;
+}
+
+.legal-prose a {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+.legal-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.legal-prose .legal-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.legal-prose th,
+.legal-prose td {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-align: left;
+  white-space: normal;
+}
+
+.legal-prose th {
+  background: rgba(32, 157, 80, 0.08);
+  font-weight: 700;
+}
+
+@media print {
+  .legal-prose .legal-table-wrap {
+    overflow-x: visible;
+  }
+}
+
 .products-backdrop {
   background-color: #14311d;
   background-image:

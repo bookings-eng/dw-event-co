@@ -1,6 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const SERVICE_AREAS = ["Keller", "Southlake", "Colleyville", "Trophy Club", "Fort Worth"];
+
+const LEGAL_LINKS = [
+  { href: "/rental-agreement", label: "Rental Agreement" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Service" },
+];
 
 export default function Footer() {
   return (
@@ -18,7 +25,7 @@ export default function Footer() {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-10 -right-10 h-64 w-auto opacity-[0.06] sm:h-80"
       />
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:grid-cols-3 sm:px-6">
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
         <div>
           <Image
             src="/logo-white.png"
@@ -57,9 +64,27 @@ export default function Footer() {
             {SERVICE_AREAS.join(", ")}, and surrounding areas
           </p>
         </div>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+            Legal
+          </h3>
+          <ul className="mt-3 flex flex-col gap-2 text-sm text-white/60">
+            {LEGAL_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="transition-colors hover:text-white">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="relative border-t border-white/10 px-4 py-5 text-center text-xs text-white/40 sm:px-6">
-        &copy; {new Date().getFullYear()} DW Event Co. All rights reserved.
+        <p>
+          Serving Keller, Southlake, Colleyville, Trophy Club, and Fort Worth — 15 mile
+          delivery radius
+        </p>
+        <p className="mt-1">&copy; {new Date().getFullYear()} DW Event Co LLC. All rights reserved.</p>
       </div>
     </footer>
   );
