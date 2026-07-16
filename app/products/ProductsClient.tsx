@@ -93,7 +93,7 @@ export default function ProductsClient({
           {SECTION_ORDER.map((tag) =>
             displayGroups[tag].length > 0 ? (
               <section key={tag} className="mb-12 last:mb-0">
-                <h2 className="mb-5 text-2xl font-bold text-foreground">
+                <h2 className="mb-5 text-2xl font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
                   {SECTION_LABELS[tag]}
                 </h2>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

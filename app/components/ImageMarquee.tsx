@@ -8,10 +8,6 @@ const MARQUEE_IMAGES = [
     alt: "White folding chairs lined up on the lawn for an outdoor wedding ceremony",
   },
   {
-    file: "micheile-henderson-KWHoxdn1IUE-unsplash.jpg",
-    alt: "White flowers tied to a white folding chair at an outdoor ceremony",
-  },
-  {
     file: "nate-johnston-xX6cPwIzgto-unsplash.jpg",
     alt: "White folding chairs arranged under a pergola with string lights at dusk",
   },
@@ -32,16 +28,8 @@ const MARQUEE_IMAGES = [
     alt: "White folding chairs glowing under string lights at an evening outdoor event",
   },
   {
-    file: "pexels-taylor-thompson-865581658-35870516.jpg",
-    alt: "Guests gathering near a barn venue at sunset for an outdoor event",
-  },
-  {
     file: "pexels-wolfart-36807077.jpg",
     alt: "White folding chairs set up in a landscaped outdoor courtyard",
-  },
-  {
-    file: "troy-olson-Gw2ODMZDeK4-unsplash.jpg",
-    alt: "White chairs and a wedding arch set up in a field at sunset",
   },
   {
     file: "victoria-priessnitz-nT7RTgQ3cu8-unsplash.jpg",

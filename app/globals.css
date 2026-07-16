@@ -69,55 +69,22 @@ body {
 }
 
 /*
- * Products page backdrop: the banner above ends in a dark #14311d wash, so
- * the backdrop opens with a matching dark-to-cream fade before settling into
- * a warm diagonal base wash and a handful of soft brand-green ellipses
- * distributed by percentage (so they spread across the full scrollable
- * height, not just the first screen). All percentage-based — no fixed
- * positioning or JS needed to cover a page of any length.
- *
- * The tactile texture (a woven linen pin-dot, standing in for the linens
- * this business rents) lives on ::before below, so its slow drift can
- * animate independently of this static layer.
+ * Products page backdrop: a real grass photo, fixed so it covers the
+ * viewport at a constant scale no matter how tall the product grid gets
+ * (a plain `cover` background would stretch/pixelate on long pages since
+ * it scales to the element's full height instead of the viewport).
+ * A dark green tint carries the banner's #14311d wash down into it so the
+ * two sections read as one continuous surface, and keeps contrast high
+ * enough for the white product cards and white section headings on top.
  */
 .products-backdrop {
-  background-color: #f5f4ed;
+  background-color: #14311d;
   background-image:
-    linear-gradient(180deg, #14311d 0%, rgba(20, 49, 29, 0.4) 90px, rgba(20, 49, 29, 0) 220px),
-    radial-gradient(720px 520px at 8% 6%, rgba(32, 157, 80, 0.20), transparent 60%),
-    radial-gradient(600px 520px at 94% 26%, rgba(32, 157, 80, 0.15), transparent 60%),
-    radial-gradient(640px 560px at 6% 56%, rgba(32, 157, 80, 0.15), transparent 60%),
-    radial-gradient(700px 600px at 96% 78%, rgba(32, 157, 80, 0.18), transparent 60%),
-    radial-gradient(560px 480px at 12% 97%, rgba(32, 157, 80, 0.14), transparent 60%),
-    linear-gradient(160deg, #faf9f3 0%, #f4f4ec 45%, #ebefe4 100%);
-  background-repeat: no-repeat;
-  box-shadow: inset 0 16px 28px -24px rgba(20, 23, 26, 0.24);
-}
-
-.products-backdrop::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    radial-gradient(rgba(32, 157, 80, 0.26) 1px, transparent 1.6px),
-    radial-gradient(rgba(32, 157, 80, 0.16) 1px, transparent 1.6px);
-  background-size: 15px 15px, 15px 15px;
-  background-position: 0 0, 7px 7px;
-  animation: linen-drift 240s linear infinite;
-}
-
-@keyframes linen-drift {
-  from {
-    background-position: 0 0, 7px 7px;
-  }
-  to {
-    background-position: 15px 15px, 22px 22px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .products-backdrop::before {
-    animation: none;
-  }
+    linear-gradient(180deg, rgba(8, 16, 10, 0.7) 0%, rgba(20, 49, 29, 0.55) 40%, rgba(20, 49, 29, 0.6) 100%),
+    url("/images/grass-products-bg.png");
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center, center;
+  background-size: 100% 100%, cover;
+  background-attachment: scroll, fixed;
+  box-shadow: inset 0 16px 28px -24px rgba(20, 23, 26, 0.4);
 }
