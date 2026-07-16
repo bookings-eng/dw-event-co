@@ -77,14 +77,14 @@ export default function ProductsClient({
   const subtotal = cartSubtotal(cart);
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
+    <div className="products-backdrop flex min-h-full flex-1 flex-col">
       <ProductsBanner
         start={start}
         end={end}
         hasDate={hasDate}
         onChangeRange={handleChangeRange}
       />
-      <div className="products-backdrop relative flex-1">
+      <div className="relative flex-1">
         <main
           className={`relative mx-auto w-full max-w-6xl px-4 py-10 transition-opacity sm:px-6 ${
             loading ? "opacity-50" : ""

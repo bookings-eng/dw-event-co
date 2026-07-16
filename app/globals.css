@@ -69,22 +69,20 @@ body {
 }
 
 /*
- * Products page backdrop: a real grass photo, fixed so it covers the
- * viewport at a constant scale no matter how tall the product grid gets
- * (a plain `cover` background would stretch/pixelate on long pages since
- * it scales to the element's full height instead of the viewport).
- * A dark green tint carries the banner's #14311d wash down into it so the
- * two sections read as one continuous surface, and keeps contrast high
- * enough for the white product cards and white section headings on top.
+ * Products page backdrop: the grass photo scrolls with the page (not
+ * fixed), so it stays directly behind the cards instead of appearing to
+ * slide under them. It's tiled vertically (width scaled to 100%, height
+ * auto) instead of stretched to `cover`, so it holds its texture at a
+ * constant scale no matter how tall the product grid gets. A flat dark
+ * green tint sits on top for contrast with the white cards and headings.
  */
 .products-backdrop {
   background-color: #14311d;
   background-image:
-    linear-gradient(180deg, rgba(8, 16, 10, 0.7) 0%, rgba(20, 49, 29, 0.55) 40%, rgba(20, 49, 29, 0.6) 100%),
+    linear-gradient(180deg, rgba(8, 16, 10, 0.55), rgba(20, 49, 29, 0.55)),
     url("/images/grass-products-bg.png");
-  background-repeat: no-repeat, no-repeat;
-  background-position: top center, center;
-  background-size: 100% 100%, cover;
-  background-attachment: scroll, fixed;
+  background-repeat: no-repeat, repeat-y;
+  background-position: top center, top center;
+  background-size: 100% 100%, 100% auto;
   box-shadow: inset 0 16px 28px -24px rgba(20, 23, 26, 0.4);
 }

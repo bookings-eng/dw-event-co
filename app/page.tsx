@@ -2,7 +2,6 @@ import Hero from "./components/Hero";
 import InfoBar from "./components/InfoBar";
 import ImageMarquee from "./components/ImageMarquee";
 import FAQSection from "./components/FAQSection";
-import Footer from "./components/Footer";
 
 export default function Home() {
   return (
@@ -11,7 +10,6 @@ export default function Home() {
       <InfoBar />
       <ImageMarquee />
       <FAQSection />
-      <Footer />
     </div>
   );
 }
