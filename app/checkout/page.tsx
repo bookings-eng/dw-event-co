@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Header from "../components/Header";
 import CartSummary from "./CartSummary";
 import { useCart } from "@/hooks/useCart";
@@ -54,6 +54,31 @@ export default function CheckoutPage() {
   const autocompleteAttachedRef = useRef(false);
   const mapsLoaded = useGoogleMapsScript(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
+  const validateAddress = useCallback(
+    async (addr: { address1: string; city: string; state: string; zip: string }) => {
+      setValidating(true);
+      setValidationError(null);
+      try {
+        const res = await fetch("/api/checkout/validate-address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(addr),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setValidationError(data.error ?? "Something went wrong.");
+          return;
+        }
+        setAddressResult({ lat: data.lat, lng: data.lng, distanceMiles: data.distanceMiles });
+      } catch {
+        setValidationError("Something went wrong. Please try again.");
+      } finally {
+        setValidating(false);
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     if (!mapsLoaded || !address1Ref.current || !window.google) return;
     if (autocompleteAttachedRef.current) return;
@@ -76,20 +101,29 @@ export default function CheckoutPage() {
         get("locality")?.long_name ?? get("sublocality")?.long_name ?? "";
       const stateName = get("administrative_area_level_1")?.short_name ?? "";
       const zipName = get("postal_code")?.long_name ?? "";
+      const streetAddress = [streetNumber, route].filter(Boolean).join(" ");
 
-      setAddress1([streetNumber, route].filter(Boolean).join(" "));
+      setAddress1(streetAddress);
       setCity(cityName);
       setState(stateName);
       setZip(zipName);
       setAddressResult(null);
       setValidationError(null);
+
+      // Autocomplete gives us a complete, structured address in one shot —
+      // validate immediately instead of waiting for the user to notice and
+      // click "Continue to Payment", so an out-of-range address surfaces
+      // right away instead of after they've moved on to other fields.
+      if (streetAddress && cityName && stateName && zipName) {
+        validateAddress({ address1: streetAddress, city: cityName, state: stateName, zip: zipName });
+      }
     });
 
     return () => {
       listener.remove();
       autocompleteAttachedRef.current = false;
     };
-  }, [mapsLoaded]);
+  }, [mapsLoaded, validateAddress]);
 
   useEffect(() => {
     if (!cart.startDate || !cart.endDate || cart.items.length === 0) return;
@@ -127,26 +161,8 @@ export default function CheckoutPage() {
     };
   }
 
-  async function handleValidateAddress() {
-    setValidating(true);
-    setValidationError(null);
-    try {
-      const res = await fetch("/api/checkout/validate-address", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address1, city, state, zip }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setValidationError(data.error ?? "Something went wrong.");
-        return;
-      }
-      setAddressResult({ lat: data.lat, lng: data.lng, distanceMiles: data.distanceMiles });
-    } catch {
-      setValidationError("Something went wrong. Please try again.");
-    } finally {
-      setValidating(false);
-    }
+  function handleValidateAddress() {
+    validateAddress({ address1, city, state, zip });
   }
 
   async function handlePay(paymentType: "deposit" | "full") {
@@ -212,39 +228,6 @@ export default function CheckoutPage() {
         <h1 className="mb-8 text-3xl font-bold text-foreground">Checkout</h1>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
           <div className="flex flex-col gap-8">
-            <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="mb-4 text-lg font-bold text-foreground">Your Information</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-                  Full Name
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
-                  />
-                </label>
-                <label className="flex flex-col gap-1 text-sm">
-                  Email
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
-                  />
-                </label>
-                <label className="flex flex-col gap-1 text-sm">
-                  Phone
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
-                  />
-                </label>
-              </div>
-            </section>
-
             <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
               <h2 className="mb-4 text-lg font-bold text-foreground">Event Address</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -312,6 +295,39 @@ export default function CheckoutPage() {
                   {validating ? "Checking address…" : "Continue to Payment"}
                 </button>
               )}
+            </section>
+
+            <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+              <h2 className="mb-4 text-lg font-bold text-foreground">Your Information</h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1 text-sm sm:col-span-2">
+                  Full Name
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  Email
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm">
+                  Phone
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="rounded-lg border border-black/10 px-3 py-2 text-foreground focus:border-brand focus:outline-none"
+                  />
+                </label>
+              </div>
             </section>
 
             {hasAvailabilityIssues && (
