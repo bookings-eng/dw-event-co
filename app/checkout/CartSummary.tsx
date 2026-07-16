@@ -35,6 +35,7 @@ export default function CartSummary({
         <h2 className="text-xl font-bold text-foreground">Your Cart</h2>
         {cart.startDate && cart.endDate && (
           <p className="mt-1 text-sm text-foreground/60">
+            <span className="font-semibold text-brand">Event date:</span>{" "}
             {formatRangeLabel(cart.startDate, cart.endDate)}
           </p>
         )}
