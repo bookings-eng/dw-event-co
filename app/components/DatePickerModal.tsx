@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { formatDateKey, formatDateLong, formatDateShort, parseDateKey } from "@/lib/date";
 import { MAX_RENTAL_DAYS } from "@/lib/constants";
 
@@ -136,7 +137,7 @@ export default function DatePickerModal({
       ? Math.round((rangeEnd.getTime() - rangeStart.getTime()) / 86400000) + 1
       : 0;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
       role="presentation"
@@ -300,6 +301,7 @@ export default function DatePickerModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

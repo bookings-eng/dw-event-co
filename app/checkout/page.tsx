@@ -1,18 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Header from "../components/Header";
 import CartSummary from "./CartSummary";
 import { useCart } from "@/hooks/useCart";
 import { useGoogleMapsScript } from "@/hooks/useGoogleMapsScript";
-import { cartDays, cartSubtotal, removeFromCart } from "@/lib/cart";
+import { cartDays, cartSubtotal, removeFromCart, type Cart } from "@/lib/cart";
 import { DELIVERY_FEE, DEPOSIT_RATE } from "@/lib/constants";
 
 type AddressResult = { lat: number; lng: number; distanceMiles: number };
 
+const EMPTY_CART: Cart = { startDate: null, endDate: null, items: [] };
+
 export default function CheckoutPage() {
-  const cart = useCart();
+  const liveCart = useCart();
+
+  // Cart reads from localStorage, which is unavailable during SSR — the
+  // server always sees an empty cart. Every render below (this page, plus
+  // CartSummary) branches its output shape on cart contents, so keeping
+  // `cart` pinned to the same empty value the server used, until mounted,
+  // keeps the first client render's shape identical to the server's.
+  // Otherwise hydration has to discard and regenerate the whole page (which
+  // was tearing down and re-attaching the Google Places Autocomplete
+  // mid-flight, silently dropping the parsed address on selection).
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const cart = mounted ? liveCart : EMPTY_CART;
   const days = cartDays(cart);
   const subtotal = cartSubtotal(cart);
 
@@ -48,7 +65,7 @@ export default function CheckoutPage() {
       types: ["address"],
     });
 
-    autocomplete.addListener("place_changed", () => {
+    const listener = autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
       const components = place.address_components ?? [];
       const get = (type: string) => components.find((c) => c.types.includes(type));
@@ -67,6 +84,11 @@ export default function CheckoutPage() {
       setAddressResult(null);
       setValidationError(null);
     });
+
+    return () => {
+      listener.remove();
+      autocompleteAttachedRef.current = false;
+    };
   }, [mapsLoaded]);
 
   useEffect(() => {
