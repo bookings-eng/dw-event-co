@@ -12,6 +12,7 @@ import { unitPriceForDays, rentalDays } from "@/lib/pricing";
 import { getProductsForRange, type ProductAvailability } from "@/lib/products";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
+import { CURRENT_AGREEMENT_VERSION } from "@/lib/legal";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -23,6 +24,7 @@ type CheckoutRequestBody = {
   customer?: { name: string; email: string; phone: string };
   address?: { address1: string; city: string; state: string; zip: string };
   paymentType?: "deposit" | "full";
+  agreementAccepted?: boolean;
 };
 
 export async function POST(request: NextRequest) {
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const { items, startDate, endDate, customer, address, paymentType } = body;
+  const { items, startDate, endDate, customer, address, paymentType, agreementAccepted } = body;
 
   if (
     !startDate ||
@@ -75,6 +77,12 @@ export async function POST(request: NextRequest) {
   }
   if (paymentType !== "deposit" && paymentType !== "full") {
     return NextResponse.json({ error: "Invalid payment type." }, { status: 400 });
+  }
+  if (agreementAccepted !== true) {
+    return NextResponse.json(
+      { error: "You must agree to the Rental Agreement before booking." },
+      { status: 400 }
+    );
   }
 
   const fullAddress = `${address.address1}, ${address.city}, ${address.state} ${address.zip}`;
@@ -154,6 +162,11 @@ export async function POST(request: NextRequest) {
 
   const supabase = getSupabaseAdmin();
 
+  // First entry of X-Forwarded-For is the original client — Vercel appends
+  // proxy hops after it. Server-set, never trust a client-supplied value.
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : null;
+
   const { data: booking, error: bookingError } = await supabase
     .from("bookings")
     .insert({
@@ -175,6 +188,9 @@ export async function POST(request: NextRequest) {
       amount_paid: 0,
       payment_type: paymentType,
       payment_status: "pending",
+      agreement_accepted_at: new Date().toISOString(),
+      agreement_version: CURRENT_AGREEMENT_VERSION,
+      agreement_accepted_ip: clientIp,
       // DB's status check constraint has no "pending" option (only
       // confirmed/delivered/returned/cancelled) — payment_status carries
       // the not-yet-paid state instead; this gets flipped to "cancelled"

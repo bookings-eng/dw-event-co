@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { formatDateLong } from "@/lib/date";
 
 export type AdminBooking = {
@@ -73,9 +74,15 @@ function BookingRow({ booking }: { booking: AdminBooking }) {
   return (
     <tr className="border-b border-black/5 text-sm">
       <td className="whitespace-nowrap px-3 py-3 font-medium text-foreground">
-        {formatDateLong(booking.eventDate)}
+        <Link href={`/admin/bookings/${booking.id}`} className="hover:text-brand hover:underline">
+          {formatDateLong(booking.eventDate)}
+        </Link>
       </td>
-      <td className="px-3 py-3 text-foreground">{booking.customerName}</td>
+      <td className="px-3 py-3 text-foreground">
+        <Link href={`/admin/bookings/${booking.id}`} className="hover:text-brand hover:underline">
+          {booking.customerName}
+        </Link>
+      </td>
       <td className="whitespace-nowrap px-3 py-3 text-foreground/70">{booking.customerPhone}</td>
       <td className="px-3 py-3 text-foreground/70">{booking.itemsSummary}</td>
       <td className="px-3 py-3 text-foreground/70">{booking.deliveryAddress}</td>

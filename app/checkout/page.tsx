@@ -47,6 +47,8 @@ export default function CheckoutPage() {
 
   const [payingType, setPayingType] = useState<"deposit" | "full" | null>(null);
   const [payError, setPayError] = useState<string | null>(null);
+  const [agreementAccepted, setAgreementAccepted] = useState(false);
+  const [agreementError, setAgreementError] = useState<string | null>(null);
 
   const [availabilityById, setAvailabilityById] = useState<Map<string, number> | null>(null);
 
@@ -167,6 +169,11 @@ export default function CheckoutPage() {
 
   async function handlePay(paymentType: "deposit" | "full") {
     if (!cart.startDate || !cart.endDate) return;
+    if (!agreementAccepted) {
+      setAgreementError("You must agree to the Rental Agreement before booking.");
+      return;
+    }
+    setAgreementError(null);
     setPayingType(paymentType);
     setPayError(null);
     try {
@@ -183,6 +190,7 @@ export default function CheckoutPage() {
           customer: { name, email, phone },
           address: { address1, city, state, zip },
           paymentType,
+          agreementAccepted,
         }),
       });
       const data = await res.json();
@@ -364,10 +372,49 @@ export default function CheckoutPage() {
                   </p>
                 )}
 
+                <div className="mb-5">
+                  <label htmlFor="agreement-checkbox" className="flex items-start gap-3 text-sm text-foreground">
+                    <input
+                      id="agreement-checkbox"
+                      type="checkbox"
+                      checked={agreementAccepted}
+                      onChange={(e) => {
+                        setAgreementAccepted(e.target.checked);
+                        if (e.target.checked) setAgreementError(null);
+                      }}
+                      aria-describedby={agreementError ? "agreement-error" : undefined}
+                      className="mt-0.5 h-5 w-5 shrink-0 rounded border-black/20 text-brand focus:ring-2 focus:ring-brand focus:ring-offset-2"
+                    />
+                    <span>
+                      I have read and agree to the DW Event Co{" "}
+                      <Link
+                        href="/rental-agreement"
+                        target="_blank"
+                        rel="noopener"
+                        className="font-semibold text-brand underline hover:text-brand-dark"
+                      >
+                        Rental Agreement
+                      </Link>
+                    </span>
+                  </label>
+                  {agreementError && (
+                    <p id="agreement-error" className="mt-2 text-sm text-red-700">
+                      {agreementError}
+                    </p>
+                  )}
+                  <p className="mt-3 text-xs leading-relaxed text-foreground/60">
+                    Your card will be securely saved by our payment processor. By booking, you
+                    authorize DW Event Co to charge it for damage, loss, late return, cleaning, or
+                    re-trip fees as described in the Rental Agreement. We will always email you
+                    photographs and an itemized statement first, and you have 5 days to dispute
+                    before any charge is processed.
+                  </p>
+                </div>
+
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
-                    disabled={payingType !== null}
+                    disabled={payingType !== null || !agreementAccepted}
                     onClick={() => handlePay("deposit")}
                     className="flex-1 rounded-full border-2 border-brand px-5 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand/10 disabled:cursor-not-allowed disabled:opacity-40"
                   >
@@ -377,7 +424,7 @@ export default function CheckoutPage() {
                   </button>
                   <button
                     type="button"
-                    disabled={payingType !== null}
+                    disabled={payingType !== null || !agreementAccepted}
                     onClick={() => handlePay("full")}
                     className="flex-1 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
                   >
