@@ -2,7 +2,7 @@ import type Stripe from "stripe";
 import { getSupabaseAdmin } from "./supabase/admin";
 import {
   sendBookingConfirmationEmail,
-  sendBookingSms,
+  sendOwnerNotificationEmail,
   type BookingItemRow,
 } from "./notifications";
 
@@ -64,10 +64,12 @@ export async function finalizeBookingPayment(
     console.error("Failed to send booking confirmation email", error);
   }
 
+  // Own try/catch, sent after the customer email: a failure here must never
+  // cost the customer their confirmation.
   try {
-    await sendBookingSms(updated, bookingItems);
+    await sendOwnerNotificationEmail(updated, bookingItems);
   } catch (error) {
-    console.error("Failed to send booking SMS", error);
+    console.error("Failed to send owner notification email", error);
   }
 
   return updated;
