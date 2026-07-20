@@ -15,8 +15,12 @@ export const metadata: Metadata = {
 
 function formatAcceptedAt(iso: string): string {
   return new Date(iso).toLocaleString("en-US", {
-    dateStyle: "medium",
-    timeStyle: "medium",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
     timeZone: "America/Chicago",
     timeZoneName: "short",
   });
